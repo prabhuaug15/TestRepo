@@ -41,9 +41,9 @@
 
     angular
         .module('myApp',[])
-        .controller("calculatorController", function($scope){
-           $scope.calculator = window.calculator = new SalaryCalculator();
-        });
+        .controller("calculatorController", ["$scope","$rootScope", function(scope, $rootScope){
+           scope.calculator = window.calculator = new SalaryCalculator();
+        }]);
 
 
 
@@ -73,7 +73,7 @@
 			<input type="button" value="Calculate" id="btnCalculate" ng-click="calculator.calculate()">
 		</div>
         <div class="field">
-            <div id="divResult" ng-bind="calculator.salary">[Salary]</div>
+            <div id="divResult" >{{calculator.salary | currency:'Rs.'}}</div>
         </div>
     </div>
 
