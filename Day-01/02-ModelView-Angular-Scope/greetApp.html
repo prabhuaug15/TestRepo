@@ -36,14 +36,24 @@
         this.greetMsg = 'Hi ' + this.firstName + " " + this.lastName + ", Have a nice day";
     }
 
-    $(function(){
-        window.greeter = new Greeter();
-        angular.bootstrap(document.body);
 
-        window.scope = angular.element(document.body).scope();
-        window.scope.greeter = greeter;
 
-        $("*[app-model]").each(function(){
+
+    function SalaryCalculator(){
+        this.basic = 0;
+        this.hra = 0;
+        this.da = 0;
+        this.tax = 0;
+        this.salary = 0;
+    }
+    SalaryCalculator.prototype.calculate = function(){
+        var gross = this.basic.toInt() + this.hra.toInt() + this.da.toInt();
+        this.salary = gross * ((100-this.tax.toInt())/100);
+    };
+
+    function compile($root, scope){
+
+         $("*[app-model]", $root).each(function(){
            var $self = $(this);
            var model = $self.attr("app-model");
 
@@ -59,7 +69,7 @@
 
         });
 
-        $("*[app-bind]").each(function(){
+        $("*[app-bind]", $root).each(function(){
            var $self = $(this);
            var model = $self.attr("app-bind");
 
@@ -69,13 +79,34 @@
 
         });
 
-        $("*[app-click]").click(function(){
+        $("*[app-click]", $root).click(function(){
 
             var expr = $(this).attr("app-click");
             scope.$apply(function(){
                 scope.$eval(expr);
             });
         });
+
+    }
+
+    $(function(){
+        window.greeter = new Greeter();
+        window.calculator = new SalaryCalculator();
+
+        angular.bootstrap(document.body);
+
+        window.scope = angular.element(document.body).scope();
+
+        window.greetScope = scope.$new();
+        greetScope.greeter = greeter;
+        compile($("#greeterRoot"), greetScope);
+
+        window.calculatorScope = scope.$new();
+        calculatorScope.calculator = calculator;
+        compile($("#calculatorRoot"), calculatorScope);
+
+
+
 
 
 
@@ -89,11 +120,38 @@
     </script>
 </head>
 <body>
+ <div class="content" id="greeterRoot">
 	 <input type="text" app-model="greeter.firstName">
 	 <input type="text" app-model="greeter.lastName">
 	 <input type="button" value="Greet" app-click="greeter.greet()">
 	 <div app-bind="greeter.greetMsg"></div>
 
+ </div>
+<div class="content" id="calculatorRoot">
+        <div class="field">
+			<label for="">Basic :</label>
+			<input type="text" name="" id="txtBasic" app-model="calculator.basic">
+		</div>
+        <div class="field">
+			<label for="">HRA :</label>
+			<input type="text" name="" id="txtHra" app-model="calculator.hra">
+		</div>
+        <div class="field">
+			<label for="">DA :</label>
+			<input type="text" name="" id="txtDa" app-model="calculator.da">
+		</div>
+        <div class="field">
+            <label for="">Tax :</label>
+            <input type="range" name="" id="rangeTax" min="0" max="30" value="0" app-model="calculator.tax">
+            <span id="spanTax" app-bind="calculator.tax">[Tax]</span>
+        </div>
+        <div class="field">
+			<input type="button" value="Calculate" id="btnCalculate" app-click="calculator.calculate()">
+		</div>
+        <div class="field">
+            <div id="divResult" app-bind="calculator.salary">[Salary]</div>
+        </div>
+    </div>
 
 </body>
 </html>
