@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Salary Calculator</title>
+	<title>Greet App</title>
 	<style>
 		#divResult{
 			color : red;
@@ -27,24 +27,21 @@
     };
 
 
-    function SalaryCalculator(){
-        this.basic = 0;
-        this.hra = 0;
-        this.da = 0;
-        this.tax = 0;
-        this.salary = 0;
+    function Greeter(){
+        this.firstName = '';
+        this.lastName = '';
+        this.greetMsg = '';
     }
-    SalaryCalculator.prototype.calculate = function(){
-        var gross = this.basic.toInt() + this.hra.toInt() + this.da.toInt();
-        this.salary = gross * ((100-this.tax.toInt())/100);
-    };
+    Greeter.prototype.greet = function(){
+        this.greetMsg = 'Hi ' + this.firstName + " " + this.lastName + ", Have a nice day";
+    }
 
     $(function(){
-        window.calculator = new SalaryCalculator();
+        window.greeter = new Greeter();
         angular.bootstrap(document.body);
 
         window.scope = angular.element(document.body).scope();
-        window.scope.calculator = calculator;
+        window.scope.greeter = greeter;
 
         $("*[app-model]").each(function(){
            var $self = $(this);
@@ -92,32 +89,10 @@
     </script>
 </head>
 <body>
-	<h1>Salary Calculator</h1>
-      <div class="content" >
-        <div class="field">
-			<label for="">Basic :</label>
-			<input type="text" name="" id="txtBasic" app-model="calculator.basic">
-		</div>
-        <div class="field">
-			<label for="">HRA :</label>
-			<input type="text" name="" id="txtHra" app-model="calculator.hra">
-		</div>
-        <div class="field">
-			<label for="">DA :</label>
-			<input type="text" name="" id="txtDa" app-model="calculator.da">
-		</div>
-        <div class="field">
-            <label for="">Tax :</label>
-            <input type="range" name="" id="rangeTax" min="0" max="30" value="0" app-model="calculator.tax">
-            <span id="spanTax" app-bind="calculator.tax">[Tax]</span>
-        </div>
-        <div class="field">
-			<input type="button" value="Calculate" id="btnCalculate" app-click="calculator.calculate()">
-		</div>
-        <div class="field">
-            <div id="divResult" app-bind="calculator.salary">[Salary]</div>
-        </div>
-    </div>
+	 <input type="text" app-model="greeter.firstName">
+	 <input type="text" app-model="greeter.lastName">
+	 <input type="button" value="Greet" app-click="greeter.greet()">
+	 <div app-bind="greeter.greetMsg"></div>
 
 
 </body>
