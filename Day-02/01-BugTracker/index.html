@@ -70,13 +70,38 @@
 
 
     -->
+    <script src="moment.js"></script>
     <script src="utils.js"></script>
     <script>
 
 
             var bugTrackerApp = angular.module("bugTrackerApp", ['utils']);
 
+            bugTrackerApp.provider("myService", function(){
+                var isPrivileged = false;
+                return {
+                    setPrivileged : function(value){
+                        isPrivileged = value;
+                    },
+                    $get : function(){
+                        return {
+                            name : "dummy",
+                            createdAt : new Date(),
+                            type : isPrivileged ? "privileged" : "regular"
+                        };
+                    }
+                };
+            });
 
+            bugTrackerApp.config(function(myServiceProvider){
+                console.log(myServiceProvider);
+                myServiceProvider.setPrivileged(true);
+                console.log("App configuration executed");
+            });
+            bugTrackerApp.run(function(myService){
+                console.log(myService);
+                console.log("App initialization succeeded");
+            });
             bugTrackerApp.value("defaultClosedStatus", false);
 
            /* bugTrackerApp.factory("bugStorage", function(Bug){
@@ -102,6 +127,7 @@
                 }
             });*/
              bugTrackerApp.service("bugStorage", function(Bug){
+                 console.log("App service executed - bugStorage");
                 var storage = window.localStorage;
 
                     this.getAll = function(){
@@ -125,6 +151,7 @@
             });
 
             bugTrackerApp.controller("bugsController", function($scope, Bug, bugStorage){
+                console.log("App controller executed - bugsController");
                 //console.log("from controller, dummyValue = ", dummyValue);
                 $scope.bugs = bugStorage.getAll();
                 $scope.addNew = function(newBug){
@@ -154,6 +181,7 @@
 
             });
             bugTrackerApp.filter("toClosedCount", function($filter){ //factory function
+                console.log("App filter executed - toClosedCount");
                 return function(bugs){ //filter function
                     /*return bugs.filter(function(bug){
                         return bug.isClosed;
@@ -204,7 +232,7 @@
             <li ng-repeat="bug in bugs | filter:searchBug | orderBy:sortAttributeName" >
 
                 <div class="title" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug.title}}</div>
-                <span class="timeStamp">{{bug.createdAt}}</span>
+                <span class="timeStamp">{{bug.createdAt | toMoment}}</span>
             </li>
         </ol>
     </div>

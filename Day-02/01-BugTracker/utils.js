@@ -1,7 +1,7 @@
 angular.module('utils',[])
     .value("defaultClosedStatus", false)
     .factory("Bug", function(defaultClosedStatus){
-
+        console.log("Utils fctory executed - Bug");
          function Bug(defautls){
             defaults = defautls || {};
             this.id = defautls.id || Date.now().toString();
@@ -14,4 +14,12 @@ angular.module('utils',[])
         };
         return Bug;
 
+    })
+    .value("momentApi", moment)
+    .filter("toMoment", function(momentApi){
+        console.log("Utils filter executed - toMoment");
+        return function(date){
+            return momentApi(date).fromNow();
+        }
     });
+
