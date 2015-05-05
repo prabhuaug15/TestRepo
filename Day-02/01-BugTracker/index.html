@@ -76,6 +76,7 @@
 
 
             var bugTrackerApp = angular.module("bugTrackerApp", ['utils']);
+            bugTrackerApp.constant("defaultStorageOption", "localStorage");
 
             bugTrackerApp.provider("myService", function(){
                 var isPrivileged = false;
@@ -93,9 +94,8 @@
                 };
             });
 
-            bugTrackerApp.config(function(myServiceProvider){
-                console.log(myServiceProvider);
-                myServiceProvider.setPrivileged(true);
+            bugTrackerApp.config(function(bugStorageProvider){
+                bugStorageProvider.setStorageOption("sessionStorage");
                 console.log("App configuration executed");
             });
             bugTrackerApp.run(function(myService){
@@ -126,7 +126,7 @@
                     }
                 }
             });*/
-             bugTrackerApp.service("bugStorage", function(Bug){
+             /*bugTrackerApp.service("bugStorage", function(Bug){
                  console.log("App service executed - bugStorage");
                 var storage = window.localStorage;
 
@@ -147,6 +147,39 @@
                     this.remove = function(bug){
                         storage.removeItem(bug.id);
                     };
+
+            });*/
+            bugTrackerApp.provider("bugStorage", function(defaultStorageOption){
+                var _storageOption = defaultStorageOption;
+                var bugStorageCtr = function(storage, Bug){
+                    this.getAll = function(){
+
+                        var result = [];
+                        for(var i=0; i< storage.length; i++){
+                            var key = storage.key(i);
+                            var data = storage.getItem(key);
+                            var bug = new Bug(angular.fromJson(data));
+                            result.push(bug);
+                        }
+                        return result;
+                    };
+                    this.save = function(bug){
+                       storage.setItem(bug.id, angular.toJson(bug));
+                    };
+                    this.remove = function(bug){
+                        storage.removeItem(bug.id);
+                    };
+                };
+                return {
+                    setStorageOption : function(option){
+                        _storageOption = option;
+                    },
+                    $get : function(Bug){
+                        var storage = _storageOption === "localStorage" ? window.localStorage : window.sessionStorage;
+                        return new bugStorageCtr(storage, Bug);
+                    }
+                }
+
 
             });
 
