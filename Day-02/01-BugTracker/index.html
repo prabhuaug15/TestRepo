@@ -35,46 +35,74 @@
     8. Persist the bugs in the server
 
     -->
+    <script src="utils.js"></script>
     <script>
-        var utils = angular.module('utils',[]);
-
-        var bugTrackerApp = angular.module("bugTrackerApp", ['utils']);
-        bugTrackerApp.controller("bugsController", function($scope){
-            $scope.bugs = [
-                {title : 'Unable to login', isClosed : false},
-                {title : 'Application shuts down frequently', isClosed : false},
-                {title : 'Add button is not visible', isClosed : false},
-                {title : 'Search is not searching', isClosed : false}
-            ];
-            $scope.addNew = function(newBug){
-                $scope.bugs.push(newBug.title);
-                newBug.title = '';
-            };
-            $scope.toggle = function(bug){
-                console.log(bug);
-                bug.isClosed = !bug.isClosed;
-            };
 
 
+            var bugTrackerApp = angular.module("bugTrackerApp", ['utils']);
 
-        });
-        bugTrackerApp.controller("dummyController", function($scope){
 
-        });
+            bugTrackerApp.value("defaultClosedStatus", true);
+            bugTrackerApp.controller("bugsController", function($scope, Bug){
+                //console.log("from controller, dummyValue = ", dummyValue);
+                $scope.bugs = [
+                    new Bug({title : 'Unable to login'}),
+                    new Bug({title : 'Application shuts down frequently'}),
+                    new Bug({title : 'Add button is not visible'}),
+                    new Bug({title : 'Search is not searching'}),
+                ];
+                $scope.addNew = function(newBug){
+                    $scope.bugs.push(newBug.title);
+                    newBug.title = '';
+                };
+                $scope.toggle = function(bug){
+                    bug.toggle();
+                };
+
+                $scope.removeClosed = function(){
+                    $scope.bugs = $scope.bugs.filter(function(bug){
+                            return !bug.isClosed;
+                    });
+                    /*for(var i=$scope.bugs.length -1; i>=0; i--)
+                        if ($scope.bugs[i].isClosed)
+                            $scope.bugs.splice(i,1);*/
+                };
+
+                /*$scope.getClosedCount = function(){
+                    return $scope.bugs.filter(function(bug){
+                        return bug.isClosed;
+                    }).length;
+                };
+*/
+
+            });
+            bugTrackerApp.filter("toClosedCount", function(){ //factory function
+                return function(bugs){ //filter function
+                    return bugs.filter(function(bug){
+                        return bug.isClosed;
+                    }).length;
+                }
+            });
+
+            bugTrackerApp.controller("dummyController", function($scope){
+
+            });
+
     </script>
+
 </head>
 <body ng-app="bugTrackerApp">
     <h1>Bug Tracker</h1>
     <div class="content" ng-controller="bugsController">
         <div class="stats">
-            <span class="closed">4</span>
+            <span class="closed">{{bugs | toClosedCount}}</span>
              /
-            <span>10</span>
+            <span>{{bugs.length}}</span>
         </div>
         <label for="">Bug :</label>
         <input type="text" ng-model="newBug.title">
         <input type="button" value="Add" ng-click="addNew(newBug)">
-        <input type="button" value="Remove Closed">
+        <input type="button" value="Remove Closed" ng-click="removeClosed()">
         <ol>
             <li ng-repeat="bug in bugs" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug}}</li>
         </ol>
