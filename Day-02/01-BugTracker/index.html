@@ -41,11 +41,22 @@
         var bugTrackerApp = angular.module("bugTrackerApp", ['utils']);
         bugTrackerApp.controller("bugsController", function($scope){
             $scope.bugs = [
-                'Unable to login',
-                'Application shuts down frequently',
-                'Add button is not visible',
-                'Search is not searching'
+                {title : 'Unable to login', isClosed : false},
+                {title : 'Application shuts down frequently', isClosed : false},
+                {title : 'Add button is not visible', isClosed : false},
+                {title : 'Search is not searching', isClosed : false}
             ];
+            $scope.addNew = function(newBug){
+                $scope.bugs.push(newBug.title);
+                newBug.title = '';
+            };
+            $scope.toggle = function(bug){
+                console.log(bug);
+                bug.isClosed = !bug.isClosed;
+            };
+
+
+
         });
         bugTrackerApp.controller("dummyController", function($scope){
 
@@ -61,11 +72,11 @@
             <span>10</span>
         </div>
         <label for="">Bug :</label>
-        <input type="text" name="" id="">
-        <input type="button" value="Add">
+        <input type="text" ng-model="newBug.title">
+        <input type="button" value="Add" ng-click="addNew(newBug)">
         <input type="button" value="Remove Closed">
         <ol>
-            <li ng-repeat="bug in bugs">{{bug}}</li>
+            <li ng-repeat="bug in bugs" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug}}</li>
         </ol>
     </div>
     <hr>
