@@ -4,8 +4,25 @@
     <meta charset="UTF-8">
     <title>Bug Tracker</title>
     <style>
+        ol{
+            width: 50%
+        }
         li{
+            list-style: none;
             cursor: pointer;
+            margin-bottom: 5px;
+            border: 2px solid black;
+            border-radius: 5px;
+            padding: 5px;
+            background: -webkit-linear-gradient(top, #e7e7e7 0%, white 100%);
+        }
+        .title{
+            font-size: 16pt;
+            font-weight: bold;
+        }
+        .timeStamp{
+            font-size: small;
+            font-style: italic;
         }
         .closed{
             font-style: italic;
@@ -184,7 +201,11 @@
         <input type="button" value="Add" ng-click="addNew(newBug)">
         <input type="button" value="Remove Closed" ng-click="removeClosed()">
         <ol>
-            <li ng-repeat="bug in bugs | filter:searchBug | orderBy:sortAttributeName" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug}}</li>
+            <li ng-repeat="bug in bugs | filter:searchBug | orderBy:sortAttributeName" >
+
+                <div class="title" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug.title}}</div>
+                <span class="timeStamp">{{bug.createdAt}}</span>
+            </li>
         </ol>
     </div>
     <hr>
