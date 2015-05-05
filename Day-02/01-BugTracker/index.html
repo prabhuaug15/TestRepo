@@ -36,12 +36,25 @@
 
     -->
     <script>
+        var utils = angular.module('utils',[]);
 
+        var bugTrackerApp = angular.module("bugTrackerApp", ['utils']);
+        bugTrackerApp.controller("bugsController", function($scope){
+            $scope.bugs = [
+                'Unable to login',
+                'Application shuts down frequently',
+                'Add button is not visible',
+                'Search is not searching'
+            ];
+        });
+        bugTrackerApp.controller("dummyController", function($scope){
+
+        });
     </script>
 </head>
-<body>
+<body ng-app="bugTrackerApp">
     <h1>Bug Tracker</h1>
-    <div class="content">
+    <div class="content" ng-controller="bugsController">
         <div class="stats">
             <span class="closed">4</span>
              /
@@ -52,10 +65,10 @@
         <input type="button" value="Add">
         <input type="button" value="Remove Closed">
         <ol>
-            <li>Bug - 1</li>
-            <li class="closed">Bug - 2</li>
-            <li>Bug - 3</li>
+            <li ng-repeat="bug in bugs">{{bug}}</li>
         </ol>
     </div>
+    <hr>
+
 </body>
 </html>
