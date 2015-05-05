@@ -34,6 +34,24 @@
     7. Persist the bugs in local storage
     8. Persist the bugs in the server
 
+   window.localStorage
+       - key/value
+       - both key and value should be strings
+
+       - APIs
+           setItem(key,value)
+           getItem(key) //=> value
+           removeItem(key)
+           key(index) //=> key
+           clear()
+           length
+
+        unique key -> Date.now().toString()
+
+        angular.toJson() / JSON.stringify(obj) => jsonString
+        angular.fromJson() / JSON.parse(jsonString) => obj
+
+
     -->
     <script src="utils.js"></script>
     <script>
