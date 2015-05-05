@@ -61,29 +61,71 @@
 
 
             bugTrackerApp.value("defaultClosedStatus", false);
-            bugTrackerApp.controller("bugsController", function($scope, Bug){
+
+           /* bugTrackerApp.factory("bugStorage", function(Bug){
+                var storage = window.localStorage;
+                return {
+                    getAll : function(){
+
+                        var result = [];
+                        for(var i=0; i< storage.length; i++){
+                            var key = storage.key(i);
+                            var data = storage.getItem(key);
+                            var bug = new Bug(angular.fromJson(data));
+                            result.push(bug);
+                        }
+                        return result;
+                    },
+                    save : function(bug){
+                       storage.setItem(bug.id, angular.toJson(bug));
+                    },
+                    remove : function(bug){
+                        storage.removeItem(bug.id);
+                    }
+                }
+            });*/
+             bugTrackerApp.service("bugStorage", function(Bug){
+                var storage = window.localStorage;
+
+                    this.getAll = function(){
+
+                        var result = [];
+                        for(var i=0; i< storage.length; i++){
+                            var key = storage.key(i);
+                            var data = storage.getItem(key);
+                            var bug = new Bug(angular.fromJson(data));
+                            result.push(bug);
+                        }
+                        return result;
+                    };
+                    this.save = function(bug){
+                       storage.setItem(bug.id, angular.toJson(bug));
+                    };
+                    this.remove = function(bug){
+                        storage.removeItem(bug.id);
+                    };
+
+            });
+
+            bugTrackerApp.controller("bugsController", function($scope, Bug, bugStorage){
                 //console.log("from controller, dummyValue = ", dummyValue);
-                $scope.bugs = [
-                    new Bug({title : 'Unable to login'}),
-                    new Bug({title : 'Application shuts down frequently'}),
-                    new Bug({title : 'Add button is not visible'}),
-                    new Bug({title : 'Search is not searching'}),
-                ];
+                $scope.bugs = bugStorage.getAll();
                 $scope.addNew = function(newBug){
-                    $scope.bugs.push(newBug.title);
-                    newBug.title = '';
+                    var bug = new Bug(newBug);
+                    bugStorage.save(bug);
+                    $scope.bugs.push(bug);
                 };
                 $scope.toggle = function(bug){
                     bug.toggle();
+                    bugStorage.save(bug);
                 };
 
                 $scope.removeClosed = function(){
-                    $scope.bugs = $scope.bugs.filter(function(bug){
-                            return !bug.isClosed;
-                    });
-                    /*for(var i=$scope.bugs.length -1; i>=0; i--)
-                        if ($scope.bugs[i].isClosed)
-                            $scope.bugs.splice(i,1);*/
+                    for(var i=$scope.bugs.length -1; i>=0; i--)
+                        if ($scope.bugs[i].isClosed){
+                            bugStorage.remove($scope.bugs[i]);
+                            $scope.bugs.splice(i,1);
+                        }
                 };
 
                 /*$scope.getClosedCount = function(){
@@ -125,6 +167,10 @@
             <span class="closed">{{ bugs | toClosedCount }}</span>
              /
             <span>{{bugs.length}}</span>
+        </div>
+        <hr>
+        <div>
+            <span>Search :</span>
             <input type="text" ng-model="searchBug.title">
             <span>closed ?</span>
             <input type="checkbox" ng-model="searchBug.isClosed">
@@ -132,6 +178,7 @@
             <span>Order By</span>
             <input type="text"  ng-model="sortAttributeName">
         </div>
+        <hr>
         <label for="">Bug :</label>
         <input type="text" ng-model="newBug.title">
         <input type="button" value="Add" ng-click="addNew(newBug)">
