@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bug Tracker</title>
+    <style>
+        ol{
+            width: 50%
+        }
+        li{
+            list-style: none;
+            cursor: pointer;
+            margin-bottom: 5px;
+            border: 2px solid black;
+            border-radius: 5px;
+            padding: 5px;
+            background: -webkit-linear-gradient(top, #e7e7e7 0%, white 100%);
+        }
+        .title{
+            font-size: 16pt;
+            font-weight: bold;
+        }
+        .timeStamp{
+            font-size: small;
+            font-style: italic;
+        }
+        .closed{
+            font-style: italic;
+            font-weight: bold;
+            text-decoration: line-through;
+            color : red;
+        }
+        .stats{
+            margin-bottom: 10px;
+            font-size: 18pt;
+        }
+    </style>
+    <script src="angular.js"></script>
+    <!--
+    Use Cases
+    ==========
+    1. Display a list of bugs
+    2. Add a new bug
+    3. Toggle the 'closed' status of a bug
+    4. Remove all closed bugs
+     . Display stats (Closed # / Total #)
+
+    5. Sort the bugs by (id, title, createdDate)
+    6. Search for the bugs
+
+    7. Persist the bugs in local storage
+    8. Persist the bugs in the server
+
+   window.localStorage
+       - key/value
+       - both key and value should be strings
+
+       - APIs
+           setItem(key,value)
+           getItem(key) //=> value
+           removeItem(key)
+           key(index) //=> key
+           clear()
+           length
+
+        unique key -> Date.now().toString()
+
+        angular.toJson() / JSON.stringify(obj) => jsonString
+        angular.fromJson() / JSON.parse(jsonString) => obj
+
+
+    -->
+    <script src="moment.js"></script>
+    <script src="utils.js"></script>
+    <script>
+
+
+            var bugTrackerApp = angular.module("bugTrackerApp", ['utils']);
+
+            bugTrackerApp.value("defaultClosedStatus", false);
+
+            bugTrackerApp.service("bugService", function($http){
+                this.getAll = function(){
+                    var promise = $http.get("http://localhost:3535/bugs");
+                    return promise;
+                };
+
+                this.save = function(bug){
+                    //fill in the blanks
+                };
+
+                this.remove = function(bug){
+                    //fill in the blanks
+                };
+            });
+
+
+            bugTrackerApp.controller("bugsController", function($scope, Bug, bugService){
+                console.log("App controller executed - bugsController");
+                //console.log("from controller, dummyValue = ", dummyValue);
+                $scope.bugs = [];
+                bugService.getAll().then(function(response){
+                    $scope.bugs = response.data.map(function(objData){
+                        return new Bug(objData);
+                    });
+                });
+                $scope.addNew = function(newBug){
+                    var bug = new Bug(newBug);
+                    bugService.save(bug);
+                    $scope.bugs.push(bug);
+                };
+                $scope.toggle = function(bug){
+                    bug.toggle();
+                    bugService.save(bug);
+                };
+
+                $scope.removeClosed = function(){
+                    for(var i=$scope.bugs.length -1; i>=0; i--)
+                        if ($scope.bugs[i].isClosed){
+                            bugService.remove($scope.bugs[i]);
+                            $scope.bugs.splice(i,1);
+                        }
+                };
+
+                /*$scope.getClosedCount = function(){
+                    return $scope.bugs.filter(function(bug){
+                        return bug.isClosed;
+                    }).length;
+                };
+*/
+
+            });
+            bugTrackerApp.filter("toClosedCount", function($filter){ //factory function
+                console.log("App filter executed - toClosedCount");
+                return function(bugs){ //filter function
+                    /*return bugs.filter(function(bug){
+                        return bug.isClosed;
+                    }).length;*/
+                    var filterFilter = $filter('filter');
+                    var countFilter = $filter('count');
+                    return countFilter(filterFilter(bugs, {isClosed : true}));
+                }
+            });
+
+            bugTrackerApp.filter("count", function(){
+                return function(data){
+                    return data.length;
+                }
+            });
+
+            bugTrackerApp.controller("dummyController", function($scope){
+
+            });
+
+    </script>
+
+</head>
+<body ng-app="bugTrackerApp">
+    <h1>Bug Tracker</h1>
+    <div class="content" ng-controller="bugsController">
+        <div class="stats">
+            <span class="closed">{{ bugs | toClosedCount }}</span>
+             /
+            <span>{{bugs.length}}</span>
+        </div>
+        <hr>
+        <div>
+            <span>Search :</span>
+            <input type="text" ng-model="searchBug.title">
+            <span>closed ?</span>
+            <input type="checkbox" ng-model="searchBug.isClosed">
+            <input type="button" value="Clear 'closed' flag" ng-click="searchBug.isClosed=undefined">
+            <span>Order By</span>
+            <input type="text"  ng-model="sortAttributeName">
+        </div>
+        <hr>
+        <label for="">Bug :</label>
+        <input type="text" ng-model="newBug.title">
+        <input type="button" value="Add" ng-click="addNew(newBug)">
+        <input type="button" value="Remove Closed" ng-click="removeClosed()">
+        <ol>
+            <li ng-repeat="bug in bugs | filter:searchBug | orderBy:sortAttributeName" >
+
+                <div class="title" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug.title}}</div>
+                <span class="timeStamp">{{bug.createdAt | toMoment}}</span>
+            </li>
+        </ol>
+    </div>
+    <hr>
+
+</body>
+</html>
