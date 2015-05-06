@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Directives</title>
+    <script src="angular.js"></script>
+    <script>
+    angular
+        .module("myApp", [])
+        .controller("myController", function($scope){
+            $scope.message = "Default time is " + new Date().toString();
+            $scope.changeData = function(){
+                $scope.message = "Current time is " + new Date().toString();
+            };
+            $scope.onTimeStampClick = function(){
+                console.log("onTimeStampClick triggered");
+                $scope.message = "Timestamp clicked at " + new Date().toString();
+            }
+        })
+        .directive("myDirective", function(){
+            return {
+                restrict : 'E',
+                scope : {
+                    msg : '=',
+                    clicked : '&'
+                },
+                replace : true,
+                template : "<div><h1>{{msg}}</h1><div><ng-transclude></ng-transclude></div></div>",
+                transclude : 'element',
+                link : function(scope, elem, attr){
+                    console.log(scope.msg);
+                    /*scope.$watch("msg", function(newValue, oldValue){
+                        elem.html(newValue);
+                    })*/
+                    //elem.html(scope.msg);
+                    elem.bind("click", function(){
+                        scope.$apply(function(){
+                            scope.clicked();
+                        });
+                        //elem.css("display", "none");
+                    });
+                }
+            };
+
+        });
+    </script>
+</head>
+<body ng-app="myApp" ng-controller="myController">
+    <input type="button" value="Change Scope Data" ng-click="changeData()">
+    <my-directive msg="message" clicked="onTimeStampClick()">
+       <div>Something from the directive</div>
+    </my-directive>
+</body>
+</html>

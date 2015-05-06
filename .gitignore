@@ -41,3 +41,7 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+/Day-03/AngularBuildApp/.tmp/
+/Day-03/AngularBuildApp/bower_components/
+/Day-03/AngularBuildApp/dist/
+/Day-03/AngularBuildApp/node_modules/
