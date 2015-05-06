@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Routing Demo</title>
+    <script src="angular.js"></script>
+    <script src="angular-route.js"></script>
+    <script>
+        angular
+            .module("routingApp", ['ngRoute'])
+            .config(function($routeProvider){
+                $routeProvider
+                    .when("/products", {
+                        //template : "<h1>Products</h1>"
+                        templateUrl : 'templates/products.template.html',
+                        controller : 'productsController'
+                    })
+                    .when("/products/:productId", {
+                        templateUrl : 'templates/productDesc.template.html',
+                        controller : 'productDescController'
+                    })
+                    .when("/customers",{
+                        //template : "<h1>Customers</h1>"
+                        templateUrl : 'templates/customers.template.html'
+                    })
+                    .otherwise({
+                        redirectTo : "/products"
+                    })
+            })
+        .service("productsService", function(){
+            this.getAll = function(){
+                return [
+                    {id : 1, name : "Pen", cost : 5, description : "A writing utility in stationaries"},
+                    {id : 2, name : "Pencil", cost : 10, description : "A writing utility in stationaries, a cheap one though"},
+                    {id : 3, name : "Marker", cost : 50, description : "A writing utility in stationaries, for the white board"}
+                ]
+            }
+        })
+        .controller("productsController", function($scope, productsService){
+            $scope.products = productsService.getAll();
+        })
+        .controller("productDescController", function($scope, $routeParams, productsService){
+            $scope.product = productsService.getAll().filter(function(p){
+                return p.id === parseInt($routeParams.productId)
+            })[0];
+
+        })
+
+    </script>
+</head>
+<body ng-app="routingApp">
+    <h1>Routing App</h1>
+    <a href="#/products">Products</a> &nbsp; &nbsp;<a href="#/customers">Customers</a>
+    <hr>
+    <ng-view></ng-view>
+</body>
+</html>
