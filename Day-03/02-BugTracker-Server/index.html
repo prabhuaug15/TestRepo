@@ -79,10 +79,30 @@
 
             bugTrackerApp.value("defaultClosedStatus", false);
 
-            bugTrackerApp.service("bugService", function($http){
+            bugTrackerApp.service("bugService", function($http, Bug, $q){
                 this.getAll = function(){
+
+                    /*var defered = $q.defer();
+
                     var promise = $http.get("http://localhost:3535/bugs");
-                    return promise;
+                    promise.then(function(response){
+                        var bugs = response.data.map(function(dataObj){
+                            return new Bug(dataObj);
+                        });
+                        defered.resolve(bugs);
+                    });
+                    promise.catch(function(error){
+                        defered.reject(error);
+                    });
+                    return defered.promise;*/
+
+                    return $http
+                            .get("http://localhost:3535/bugs")
+                            .then(function(response){
+                                    return response.data.map(function(dataObj){
+                                        return new Bug(dataObj);
+                                    });
+                            });
                 };
 
                 this.save = function(bug){
@@ -99,10 +119,8 @@
                 console.log("App controller executed - bugsController");
                 //console.log("from controller, dummyValue = ", dummyValue);
                 $scope.bugs = [];
-                bugService.getAll().then(function(response){
-                    $scope.bugs = response.data.map(function(objData){
-                        return new Bug(objData);
-                    });
+                bugService.getAll().then(function(bugs){
+                    $scope.bugs = bugs;
                 });
                 $scope.addNew = function(newBug){
                     var bug = new Bug(newBug);
