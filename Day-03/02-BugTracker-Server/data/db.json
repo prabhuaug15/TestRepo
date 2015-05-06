@@ -1,0 +1,28 @@
+{
+  "bugs": [
+    {
+      "id": 1,
+      "title": "Unable to login",
+      "isClosed": false,
+      "createdAt": "2015-05-06T04:50:27.139Z"
+    },
+    {
+      "id": 2,
+      "title": "Server communication failure",
+      "isClosed": false,
+      "createdAt": "2015-05-06T04:30:27.139Z"
+    },
+    {
+      "id": 3,
+      "title": "User authentication malfunctions",
+      "isClosed": false,
+      "createdAt": "2015-05-06T05:51:02.851Z"
+    },
+    {
+      "title": "Data persistence inconsistent",
+      "isClosed": false,
+      "createdAt": "2015-05-06T03:50:27.139Z",
+      "id": 4
+    }
+  ]
+}
